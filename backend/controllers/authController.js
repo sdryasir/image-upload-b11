@@ -1,27 +1,62 @@
 import { User } from "../model/userSchema.js";
 import bycrypt from 'bcryptjs'
 import jwt from "jsonwebtoken";
-
-
+import path from 'path';
+const __dirname = path.resolve();
+import fs from 'fs';
 
 export const registerUser = async (req, res, next) => {
 
     const user = req.body;
 
 
+    try {
+        const encoded = user.avatar;
+        const base64ToArray = encoded.split(";base64,");
+        const prefix = base64ToArray[0];
+        const extension = prefix.replace(/^data:image\//, '');
+        
+        if (extension === 'jpeg' || extension === 'jpg' || extension === 'png')
+        {
 
-    // user.password
+            const imageData = base64ToArray[1];
+            const fileName = (new Date().getTime() / 1000|0) + '.' + extension;
+            const imagePath = path.join(__dirname, './uploads/') + fileName; //upload/32658921_abc.jpg
+            const filePath = path.resolve(imagePath);
 
-    // user.password = await bycrypt.hash(user.password, 10)
 
-    // try {
-    //     await User.create(user)
-    //     res.json({
-    //         message: 'The User has been registered'
-    //     })
-    // } catch (err) {
-    //     next(err)
-    // }
+            
+
+            if(fs.writeFileSync(filePath, imageData,  { encoding: 'base64' })){
+                user.avatar = filePath
+                user.password
+                user.password = await bycrypt.hash(user.password, 10)
+    
+                await User.create(user)
+            }
+
+            return res.status(201).json({
+                error: false,
+                message: "Account has been created",
+            });
+        }
+        else {
+            return res.status(403).json({
+                error: true,
+                message: "Base64 data not valid!",
+            });
+        }
+    }
+    catch (e) {
+        return res.status(403).json({
+            error: true,
+            message: e.message,
+        });
+    }
+
+
+
+    
 }
 
 export const loginUser = async (req, res, next) => {

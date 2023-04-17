@@ -5,6 +5,10 @@ import Button from '@mui/material/Button';
 import { makeStyles } from 'tss-react/mui';
 import { useDispatch } from 'react-redux';
 import placeholder from '../avatar.webp'
+import axios from 'axios';
+
+
+
 const useStyles = makeStyles((theme) => ({
   root: {
     '& > *': {
@@ -29,21 +33,16 @@ function SignUp(){
     event.preventDefault();
    
     const newUser = {
-
-        id : Date.now(),
         fullName,
         username,
         email,
         password,
-        avatar:''
+        avatar
     }
 
     console.log(newUser);
 
-    await fetch('http://localhost:8000/v1/auth/register', {
-            method: 'POST',
-            body: newUser
-        });
+    await axios.post('http://localhost:8000/v1/auth/register', newUser);
 
         
         setFullName('');

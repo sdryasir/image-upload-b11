@@ -12,7 +12,7 @@ const app = express()
 
 connectDB();
 app.use(cors())
-app.use(bodyParser.json())
+app.use(bodyParser({limit: '50mb'}))
 app.use(cookieParser())
 
 app.use('/v1', todoRoutes)
